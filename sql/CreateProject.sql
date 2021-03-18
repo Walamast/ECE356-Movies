@@ -1,0 +1,11 @@
+-- -----------------------------------------------------------------------------
+--
+-- ECE 356 Project
+-- Database Creation
+-- 
+-- Walter Alejandro Lam Astudillo	walamast
+-- Bruce Nguyen						b34nguye
+-- Darius Andrew Wigglesworth		dawiggle
+--
+-- This file creates the database used for this ECE356 project.
+-- 

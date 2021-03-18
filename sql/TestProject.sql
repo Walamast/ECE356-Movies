@@ -1,0 +1,12 @@
+-- -----------------------------------------------------------------------------
+--
+-- ECE 356 Project
+-- Database Testing
+-- 
+-- Walter Alejandro Lam Astudillo	walamast
+-- Bruce Nguyen						b34nguye
+-- Darius Andrew Wigglesworth		dawiggle
+--
+-- This file includes the unit tests to verify the validity of the 
+-- database used for this ECE356 project.
+-- 
