@@ -1,5 +1,5 @@
-import {Link} from 'react-router-dom'
-import './Navbar.css'
+import { Link, NavLink } from 'react-router-dom';
+import './Navbar.scss';
 
 function Navbar() {
   return (
@@ -13,10 +13,10 @@ function Navbar() {
               <option value="people">People</option>
               <option value="genre">Genre</option>
             </select>
-            <button type="submit" class="btn btn-primary"><img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Magnifying_glass_icon.svg" /></button>
+            <button type="submit" className="btn btn-primary"><img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Magnifying_glass_icon.svg" /></button>
           </div>
           <ul className="navbar-links">
-            <li><Link to="/about">About</Link></li>
+            <li><NavLink activeClassName="active" to="/about">About</NavLink></li>
           </ul>
       </nav>
     </>
