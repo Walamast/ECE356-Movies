@@ -1,0 +1,88 @@
+.about {
+  color: white;
+  padding: 10em 20em;
+
+  h1 {
+    font-weight: 900;
+    color: rgb(243, 206, 19);
+  }
+
+  h6 {
+    margin-bottom: 5em;
+    font-size: 0.8em;
+  }
+
+  p {
+    font-size: 1.2em;
+  }
+}
+
+.about-us {
+  color: #ffffff;
+  padding: 0 20em 10em 20em;
+
+  .col-sm {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  h1 {
+    font-weight: 900;
+    font-size: 1.5em;
+    color: rgb(243, 206, 19);
+  }
+  
+  .about-pic {
+    width: 60%;
+    border-radius: 50%;
+    margin: 2em 0;
+ 
+    &:before{
+      content: '';
+      display: block;
+      padding-top: 100%;
+    }
+  }
+
+  #walter {
+    background: url("https://scontent.fyyz1-1.fna.fbcdn.net/v/t1.6435-9/47579272_1902214579893331_6802000338728517632_n.jpg?_nc_cat=104&ccb=1-3&_nc_sid=09cbfe&_nc_ohc=KBNTLNofIyUAX-GeWSD&_nc_ht=scontent.fyyz1-1.fna&oh=761c7f57cc4e1eb80ddd623bfd8b85ef&oe=6091DA17");
+    background-size: cover;
+  }
+
+  #bruce {
+    background: url("https://avatars.githubusercontent.com/u/44987693?v=4");
+    background-size: cover;
+  }
+
+  #darius {
+    background: url("https://avatars.githubusercontent.com/u/6377167?v=4");
+    background-size: cover;
+  }
+
+  h2 {
+    text-align: center;
+    font-weight: 900;
+    font-size: 1.2em;
+  }
+
+  .col-sm > a {
+    color: gray;
+    word-wrap: break-word;
+  }
+}
+
+@media(max-width: 1280px) {
+  .about {
+    padding: 10em 2em;
+  }
+
+  
+  .about-us {
+    padding: 2em;
+
+    .about-pic {
+      width: 100%;
+    }
+  }
+}

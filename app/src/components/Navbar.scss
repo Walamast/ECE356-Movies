@@ -1,8 +1,10 @@
 .navbar {
   padding: 1em 20em;
   border-bottom: 1px solid #111;
-  position: sticky;
+  background: black;
+  position: fixed;
   width: 100%;
+  z-index: 100;
 }
 
 .navbar-logo {
@@ -53,5 +55,16 @@
   a {
     font-weight: 900;
     font-size: 1.2em;
+    color: white;
+
+    &:hover, &.active {
+      color: rgb(243, 206, 19);
+    }
+  }
+}
+
+@media(max-width: 1280px) {
+  .navbar {
+    padding: 1em 2em;
   }
 }
