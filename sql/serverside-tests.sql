@@ -53,8 +53,8 @@ select '5 movies in English' as '';
 select title from Movies inner join MovieLanguage using (movieID) where language = 'English' limit 5;
 
 -- Test 7) 
-select 'First name of people whose first name start with Fred' as '';
--- there are 296 Fred(s), but 746 people whose first name is Fred% with 23 different Fred% variations   
+select 'Distinct First names of people whose first name start with Fred' as '';
+-- there are 296 "Fred"(s), but 746 people whose first name is Fred% with 23 different Fred% variations   
 with People_distinct as 
 	(select distinct name from People where name like 'Fred%'), 
 	People_substring as 
