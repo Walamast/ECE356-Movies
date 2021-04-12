@@ -356,7 +356,7 @@ insert into MovieLanguage (movieID, language) select movieID, language4 from Mov
 
 -- Temp table for use in two tables below
 
-create table IMDBtitlePrinciples(imdbID char(10),
+create temporary table IMDBtitlePrinciples(imdbID char(10),
                                        imdbNameID char(10),
                                        category varchar(19),
                                        role varchar(255),
