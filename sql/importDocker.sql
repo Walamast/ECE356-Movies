@@ -9,8 +9,8 @@ drop table if exists MovieLanguage;
 drop table if exists MovieCrew;
 drop table if exists MovieCast;
 drop table if exists MovieKeyword;
-drop table if exists RatingIMDB;
-drop table if exists UserRatings;
+drop table if exists RatingsIMDB;
+drop table if exists UserRatingsTMDB;
 drop table if exists UserRatingDemographics;
 drop table if exists Movies;
 drop table if exists People;
@@ -104,6 +104,11 @@ update Movies inner join mpaa on Movies.imdbID = mpaa.imdbID
 set Movies.mpaa = mpaa.mpaa
 where Movies.imdbID = mpaa.imdbID;
 
+update Movies set runTimeMinutes = NULL where runTimeMinutes = -1;
+update Movies set budget = NULL where budget = -1;
+update Movies set grossUSA = NULL where grossUSA = -1;
+update Movies set grossInternational = NULL where grossInternational = -1;
+
 -- People
 
 create table People(personID int auto_increment,
@@ -139,7 +144,7 @@ load data infile '/var/lib/mysql-files/project/PeopleIMDB.csv' into table People
      enclosed by '"'
      lines terminated by '\r\n'
      ignore 1 lines
-     (imdbNameID, name, heightInCM, bio, birthDate, birthPlace, deathDate, deathPlace, deathCause, totalChildren);
+     (imdbNameID, name, heightInCM, @bio, birthDate, birthPlace, deathDate, deathPlace, deathCause, totalChildren);
 
 update PeopleIMDB
 set birthDate = NULL
@@ -152,6 +157,9 @@ where deathDate = '2025-01-01 00:00:00';
 insert into People (imdbNameID, name, bio, birthDate, birthPlace, deathDate, deathPlace, deathCause, totalChildren)
 select imdbNameID, name, bio, birthDate, birthPlace, deathDate, deathPlace, deathCause, totalChildren
 from PeopleIMDB;
+
+update People set heightInCM = NULL where heightInCM = -1;
+update People set totalChildren = NULL where totalChildren = -1;
 
 -- MovieProductionCompany
 
@@ -372,6 +380,8 @@ load data infile '/var/lib/mysql-files/project/IMDBtitlePrinciples.csv' into tab
      ignore 1 lines
      (imdbID, imdbNameID, category, role);
 
+create index imdbNameIndex on IMDBtitlePrinciples (imdbNameID);
+
 update IMDBtitlePrinciples inner join Movies on IMDBtitlePrinciples.imdbID = Movies.imdbID
 set IMDBtitlePrinciples.movieID = Movies.movieID
 where IMDBtitlePrinciples.imdbID = Movies.imdbID;
@@ -390,7 +400,7 @@ create table MovieCrew(movieID int,
                        foreign key (personID) references People (personID)
                       );
 
-insert into MovieCrew (movieID, personID, role) select movieID, personID, category from IMDBtitlePrinciples where category <> '';
+insert into MovieCrew (movieID, personID, role) select movieID, personID, category from IMDBtitlePrinciples where movieID IS NOT NULL and personID IS NOT NULL and category <> '';
 
 -- MovieCast
 
@@ -402,7 +412,7 @@ create table MovieCast(movieID int,
                        foreign key (personID) references People (personID)
                       );
 
-insert into MovieCast (movieID, personID, role) select movieID, personID, role from IMDBtitlePrinciples where role <> '';
+insert into MovieCast (movieID, personID, role) select movieID, personID, role from IMDBtitlePrinciples where movieID IS NOT NULL and personID IS NOT NULL and role <> '';
 
 -- MovieKeyword
 
@@ -542,6 +552,10 @@ where tempRatingsIMDB.imdbID = Movies.imdbID;
 
 insert into RatingsIMDB (movieID, totalVotes, meanVote, medianVote) select movieID, totalVotes, meanVote, medianVote from tempRatingsIMDB where movieID IS NOT NULL;
 
+update RatingsIMDB set totalVotes = NULL where totalVotes = -1;
+update RatingsIMDB set meanVote = NULL where meanVote = -1;
+update RatingsIMDB set medianVote = NULL where medianVote = -1;
+
 -- UserRatingsTMDB
 
 create table UserRatingsTMDB(movieID int,
@@ -572,6 +586,10 @@ set tempRatingsTMDB.movieID = Movies.movieID
 where tempRatingsTMDB.tmdbID = Movies.tmdbID;
 
 insert into UserRatingsTMDB (movieID, totalVotes, meanVote, medianVote) select movieID, totalVotes, meanVote, medianVote from tempRatingsTMDB where movieID IS NOT NULL;
+
+update UserRatingsTMDB set totalVotes = NULL where totalVotes = -1;
+update UserRatingsTMDB set meanVote = NULL where meanVote = -1;
+update UserRatingsTMDB set medianVote = NULL where medianVote = -1;
 
 -- UserRatingDemographics
 
@@ -632,6 +650,8 @@ delete from UserRatingDemographics where movieID IS NULL or gender IS NULL or ag
 alter table UserRatingDemographics alter gender drop default;
 alter table UserRatingDemographics modify movieID int not null, modify gender char(1) not null, modify ageStart int not null;
 alter table UserRatingDemographics add primary key (movieID, gender, ageStart);
+
+update UserRatingDemographics set meanVote = null where meanVote = -1;
 
 -- finish
 nowarning;
