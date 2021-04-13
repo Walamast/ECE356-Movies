@@ -109,6 +109,9 @@ update Movies set budget = NULL where budget = -1;
 update Movies set grossUSA = NULL where grossUSA = -1;
 update Movies set grossInternational = NULL where grossInternational = -1;
 
+create index imdbIDIndexMovies on Movies (imdbID);
+create index tmdbIDIndexMovies on Movies (tmdbID);
+
 -- People
 
 create table People(personID int auto_increment,
@@ -160,6 +163,9 @@ from PeopleIMDB;
 
 update People set heightInCM = NULL where heightInCM = -1;
 update People set totalChildren = NULL where totalChildren = -1;
+
+create index imdbIDIndexPeople on People (imdbNameID);
+create index tmdbIDIndexPeople on People (tmdbNameID);
 
 -- MovieProductionCompany
 
