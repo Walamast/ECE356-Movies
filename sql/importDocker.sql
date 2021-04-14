@@ -317,7 +317,7 @@ insert into MovieGenre (movieID, genre) select movieID, genre6 from MovieGenreTM
 -- MovieLanguage
 
 create table MovieLanguage(movieID int,
-                           language varchar(25),
+                           language varchar(37),
                            primary key (movieID, language),
                            foreign key (movieID) references Movies (movieID)
                           );
@@ -340,24 +340,24 @@ update MovieLanguageIMDB inner join Movies on MovieLanguageIMDB.imdbID = Movies.
 set MovieLanguageIMDB.movieID = Movies.movieID
 where MovieLanguageIMDB.imdbID = Movies.imdbID;
 
-insert into MovieLanguage (movieID, language) select movieID, language1 from MovieLanguageIMDB where movieID IS NOT NULL and language1 <> '';
-insert into MovieLanguage (movieID, language) select movieID, language2 from MovieLanguageIMDB where movieID IS NOT NULL and language2 <> '';
+insert into MovieLanguage (movieID, language) select movieID, TRIM(language1) from MovieLanguageIMDB where movieID IS NOT NULL and language1 <> '';
+insert into MovieLanguage (movieID, language) select movieID, TRIM(language2) from MovieLanguageIMDB where movieID IS NOT NULL and language2 <> '';
 
 create temporary table MovieLanguageTMDB (tmdbID int,
-                                          language1 varchar(2),
-                                          language2 varchar(2),
-                                          language3 varchar(2),
-                                          language4 varchar(2),
+                                          language1 varchar(37),
+                                          language2 varchar(37),
+                                          language3 varchar(37),
+                                          language4 varchar(37),
                                           movieID int,
                                           primary key (tmdbID)
                                          );
 
-load data infile '/var/lib/mysql-files/project/MovieLanguageTMDB.csv' into table MovieLanguageTMDB
+load data infile '/var/lib/mysql-files/project/MovieLanguageTMDBFixed.csv' into table MovieLanguageTMDB
      fields terminated by ','
      enclosed by '"'
      lines terminated by '\r\n'
      ignore 1 lines
-     (tmdbID, language1, language2, language3, language4);
+     (tmdbID, Language1, Language2, Language3, Language4);
 
 update MovieLanguageTMDB inner join Movies on MovieLanguageTMDB.tmdbID = Movies.tmdbID
 set MovieLanguageTMDB.movieID = Movies.movieID
@@ -367,6 +367,8 @@ insert into MovieLanguage (movieID, language) select movieID, language1 from Mov
 insert into MovieLanguage (movieID, language) select movieID, language2 from MovieLanguageTMDB where movieID IS NOT NULL and language2 <> '';
 insert into MovieLanguage (movieID, language) select movieID, language3 from MovieLanguageTMDB where movieID IS NOT NULL and language3 <> '';
 insert into MovieLanguage (movieID, language) select movieID, language4 from MovieLanguageTMDB where movieID IS NOT NULL and language4 <> '';
+
+delete from MovieLanguage where language = '';
 
 -- Temp table for use in two tables below
 
