@@ -172,7 +172,7 @@ create index tmdbIDIndexPeople on People (tmdbNameID);
 create table MovieProductionCompany(movieID int,
                                     companyName varchar(255),
                                     primary key (movieID, companyName),
-                                    foreign key (movieID) references Movies (movieID)
+                                    foreign key (movieID) references Movies (movieID) on delete cascade
                                    );
 
 create temporary table MovieProductionCompanyIMDB(imdbID char(10),
@@ -259,7 +259,7 @@ insert into MovieProductionCompany (movieID, companyName) select movieID, compan
 create table MovieGenre(movieID int,
                         genre varchar(15),
                         primary key (movieID, genre),
-                        foreign key (movieID) references Movies (movieID)
+                        foreign key (movieID) references Movies (movieID)  on delete cascade
                        );
 
 create temporary table MovieGenreIMDB(imdbID char(10),
@@ -319,7 +319,7 @@ insert into MovieGenre (movieID, genre) select movieID, genre6 from MovieGenreTM
 create table MovieLanguage(movieID int,
                            language varchar(37),
                            primary key (movieID, language),
-                           foreign key (movieID) references Movies (movieID)
+                           foreign key (movieID) references Movies (movieID)  on delete cascade
                           );
 
 create temporary table MovieLanguageIMDB (imdbID char(10),
@@ -404,8 +404,8 @@ create table MovieCrew(movieID int,
                        personID int,
                        role varchar(255),
                        primary key (movieID, personID, role),
-                       foreign key (movieID) references Movies (movieID),
-                       foreign key (personID) references People (personID)
+                       foreign key (movieID) references Movies (movieID)  on delete cascade,
+                       foreign key (personID) references People (personID)  on delete cascade
                       );
 
 insert into MovieCrew (movieID, personID, role) select movieID, personID, category from IMDBtitlePrinciples where movieID IS NOT NULL and personID IS NOT NULL and category <> '';
@@ -416,8 +416,8 @@ create table MovieCast(movieID int,
                        personID int,
                        role varchar(255),
                        primary key (movieID, personID, role),
-                       foreign key (movieID) references Movies (movieID),
-                       foreign key (personID) references People (personID)
+                       foreign key (movieID) references Movies (movieID)  on delete cascade,
+                       foreign key (personID) references People (personID)  on delete cascade
                       );
 
 insert into MovieCast (movieID, personID, role) select movieID, personID, role from IMDBtitlePrinciples where movieID IS NOT NULL and personID IS NOT NULL and role <> '';
@@ -427,7 +427,7 @@ insert into MovieCast (movieID, personID, role) select movieID, personID, role f
 create table MovieKeyword(movieID int,
                           keyword varchar(50),
                           primary key (movieID, keyword),
-                          foreign key (movieID) references Movies (movieID)
+                          foreign key (movieID) references Movies (movieID)  on delete cascade
                          );
 
 create temporary table keywords(tmdbID int,
@@ -536,7 +536,7 @@ create table RatingsIMDB(movieID int,
                         meanVote float,
                         medianVote int,
                         primary key (movieID),
-                        foreign key (movieID) references Movies (movieID)
+                        foreign key (movieID) references Movies (movieID)  on delete cascade
                        );
 
 create temporary table tempRatingsIMDB(imdbID char(10),
@@ -571,7 +571,7 @@ create table UserRatingsTMDB(movieID int,
                              meanVote float,
                              medianVote float,
                              primary key (movieID),
-                             foreign key (movieID) references Movies (movieID)
+                             foreign key (movieID) references Movies (movieID)  on delete cascade
                             );
 
 create temporary table tempRatingsTMDB(tmdbID int,
@@ -606,7 +606,7 @@ create table UserRatingDemographics(movieID int,
                                     ageStart int,
                                     meanVote float,
                                     unique (movieID, gender, ageStart),
-                                    foreign key (movieID) references Movies (movieID)
+                                    foreign key (movieID) references Movies (movieID) on delete cascade
                                    );
 
 create temporary table UserDemoTemp(imdbID char(10),
