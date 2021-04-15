@@ -4,7 +4,7 @@ This project includes all of the source code for the client application and data
 _***insert demo video here***_
 
 ## `app`
-Client application source code. Requirements TBD.
+Client application source code. Requires NodeJS.
 
 ## `sql`
 MySQL database-related source files.

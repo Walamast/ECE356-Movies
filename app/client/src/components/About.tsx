@@ -21,16 +21,28 @@ function About() {
             <div className="about-pic" id="walter"/>
             <h2>Walter Alejandro Lam Astudillo</h2>
             <a href="mailto:walamast@uwaterloo.ca">walamast@uwaterloo.ca</a>
+            <p>
+              Completed the preliminary relational schema design, designed unit tests
+              for the schema, and worked on the data-mining analysis.
+            </p>
           </div>
           <div className="col-sm">
             <div className="about-pic" id="bruce"/>
             <h2>Bruce Nguyen</h2>
             <a href="mailto:b34nguye@uwaterloo.ca">b34nguye@uwaterloo.ca</a>
+            <p>
+              Assisted with the relational schema design, and did full-stack development
+              for the client application, including unit testing.
+            </p>
           </div>
           <div className="col-sm">
             <div className="about-pic" id="darius"/>
             <h2>Darius Andrew Wigglesworth</h2>
             <a href="mailto:dawiggle@uwaterloo.ca">dawiggle@uwaterloo.ca</a>
+            <p>
+              Responsible for correcting the data for import and implementing the
+              schema. Also worked on the data-mining analysis.
+            </p>
           </div>
         </div>
       </div>

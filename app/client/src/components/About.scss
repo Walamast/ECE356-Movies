@@ -70,6 +70,11 @@
     color: gray;
     word-wrap: break-word;
   }
+
+  p {
+    margin-top: 2em;
+    padding: 0 2em;
+  }
 }
 
 @media(max-width: 1280px) {
