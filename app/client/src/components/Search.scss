@@ -1,0 +1,25 @@
+.search {
+    padding: 10em 20em;
+    color: white;
+
+    h1 {
+        font-size: 2em;
+        font-weight: 900;
+    }
+
+    ul {
+        list-style: none;
+        padding: 2em 0;
+    }
+
+    li {
+        font-size: 1.2em;
+        padding: 0.4em 0;
+    }
+}
+
+@media(max-width: 1280px) {
+    .search {
+        padding: 10em 2em;
+    }
+}

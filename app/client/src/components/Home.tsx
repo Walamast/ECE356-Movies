@@ -45,7 +45,7 @@ function Home() {
           <ul>
             {latestMovies.map((val: any, key: any) => {
               const url = "/movie/" + val.movieID;
-              return (<li key={key}><a href={url}>{val.originalTitle}</a></li>);
+              return (<li key={key}><a href={url}>{val.originalTitle}{val.year ? " (" + val.year + ")" : ""}</a></li>);
             })}
           </ul>
         </div>
@@ -54,7 +54,7 @@ function Home() {
           <ul>
             {topGrossMovies.map((val: any, key: any) => {
               const url = "/movie/" + val.movieID;
-              return (<li key={key}><a href={url}>{val.originalTitle}</a></li>);
+              return (<li key={key}><a href={url}>{val.originalTitle}{val.year ? " (" + val.year + ")" : ""}</a></li>);
             })}
           </ul>
         </div>

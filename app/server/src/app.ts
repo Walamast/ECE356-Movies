@@ -37,11 +37,11 @@ const runQuery = (query: string, res: any) => {
 }
 
 app.get('/api/latest', (req, res) => {
-    runQuery("select movieID, originalTitle from Movies where releaseDate <= curdate() order by releaseDate desc limit 10", res);
+    runQuery("select movieID, originalTitle, year(releaseDate) as year from Movies where releaseDate <= curdate() order by releaseDate desc limit 10", res);
 });
 
 app.get('/api/gross', (req, res) => {
-    runQuery("select movieID, originalTitle from Movies order by grossInternational desc limit 10", res);
+    runQuery("select movieID, originalTitle, year(releaseDate) as year from Movies order by grossInternational desc limit 10", res);
 });
 
 app.get('/api/birthday', (req, res) => {

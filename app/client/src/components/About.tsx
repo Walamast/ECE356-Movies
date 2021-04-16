@@ -8,9 +8,9 @@ function About() {
         <h6>Created for ECE 356 at the University of Waterloo.</h6>
         <p>
           Search for your favourite movie or actor, and maybe learn a bit about them.
-          Do you need some new recommendations? Use our tools to find the best picks for you.<br/><br/>
+          Create an account and write reviews for your favourite (and least favourite) movies!.<br/><br/>
 
-          This app was created using React and TypeScript. Our data was sourced from <a href="https://www.kaggle.com/stefanoleone992/imdb-extensive-dataset">here</a> and <a href="https://www.kaggle.com/rounakbanik/the-movies-dataset">here</a>,
+          This app was created using React, Express, and TypeScript. Our data was sourced from <a href="https://www.kaggle.com/stefanoleone992/imdb-extensive-dataset">here</a> and <a href="https://www.kaggle.com/rounakbanik/the-movies-dataset">here</a>,
           normalized and stored on a MySQL database.
         </p>
       </div>
