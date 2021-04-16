@@ -18,7 +18,7 @@ drop table if exists People;
 -- Create Movies table and fill it
 
 create table Movies(movieID int auto_increment,
-                    imdbID char(10) default null,
+                    imdbID int default null,
                     tmdbID int default null,
                     title varchar(255),
                     originalTitle varchar(255),
@@ -34,66 +34,27 @@ create table Movies(movieID int auto_increment,
                     unique(imdbID, tmdbID)
                     );
 
-create temporary table MoviesIMDB(imdbID varchar(255),
-                                  title varchar(255) default null,
-                                  originalTitle varchar(255) default null,
-                                  releaseDate dateTime default null,
-                                  runTimeMinutes int,
-                                  description varchar(1000) default null,
-                                  budget bigint,
-                                  budgetCurrency varchar(3) default null,
-                                  grossUSA bigint,
-                                  grossInternational bigint,
-                                  primary key (imdbID)
-                                 );
-
-load data infile '/var/lib/mysql-files/03-Movies/Project35/MoviesIMDB.csv' into table MoviesIMDB
+load data infile '/var/lib/mysql-files/03-Movies/Project35/AllMovies.csv' into table Movies
      fields terminated by ','
      enclosed by '"'
      lines terminated by '\r\n'
      ignore 1 lines
-     (imdbID, title, originalTitle, releaseDate, runTimeMinutes, description, budget, budgetCurrency, grossUSA, grossInternational);
+     (imdbID, tmdbID, title, originalTitle, releaseDate, runTimeMinutes, description, budget, budgetCurrency, grossUSA, grossInternational);
 
-insert into Movies (imdbID, title, originalTitle, releaseDate, runTimeMinutes, description, budget, budgetCurrency, grossUSA, grossInternational)
-select imdbID, title, originalTitle, releaseDate, runTimeMinutes, description, budget, budgetCurrency, grossUSA, grossInternational
-from MoviesIMDB;
-
-create temporary table MoviesTMDB(tmdbID int,
-                                  title varchar(255) default null,
-                                  originalTitle varchar(255) default null,
-                                  releaseDate dateTime default null,
-                                  runTimeMinutes int,
-                                  budget bigint,
-                                  description varchar(1000),
-                                  grossInternational bigint,
-                                  primary key (tmdbID)
-                                 );
-
-load data infile '/var/lib/mysql-files/03-Movies/Project35/MoviesTMDB.csv' into table MoviesTMDB
-     fields terminated by ','
-     enclosed by '"'
-     lines terminated by '\r\n'
-     ignore 1 lines
-     (tmdbID, title, originalTitle, releaseDate, runTimeMinutes, budget, description, grossInternational);
-
-update MoviesTMDB
+update Movies
 set releaseDate = NULL
 where releaseDate = "2025-01-01 00:00:00";
 
-insert into Movies (tmdbID, title, originalTitle, releaseDate, runTimeMinutes, budget, description, grossInternational)
-select tmdbID, title, originalTitle, releaseDate, runTimeMinutes, budget, description, grossInternational
-from MoviesTMDB;
-
 update Movies
-set budgetCurrency = 'USD'
-where tmdbID is not NULL;
+set tmdbID = NULL
+where tmdbID = -1;
 
-create temporary table mpaa(imdbID char(10),
+create temporary table mpaa(imdbID int,
                             mpaa varchar(5),
                             primary key (imdbID)
                            );
 
-load data infile '/var/lib/mysql-files/03-Movies/Project35/mpaaIMDB.csv' into table mpaa
+load data infile '/var/lib/mysql-files/03-Movies/Project35/mpaaIMDBFixed.csv' into table mpaa
      fields terminated by ','
      enclosed by '"'
      lines terminated by '\r\n'
@@ -101,7 +62,7 @@ load data infile '/var/lib/mysql-files/03-Movies/Project35/mpaaIMDB.csv' into ta
      (imdbID, mpaa);
 
 update Movies inner join mpaa on Movies.imdbID = mpaa.imdbID
-set Movies.mpaa = mpaa.mpaa
+set Movies.mpaa = TRIM(mpaa.mpaa)
 where Movies.imdbID = mpaa.imdbID;
 
 update Movies set runTimeMinutes = NULL where runTimeMinutes = -1;
@@ -116,7 +77,6 @@ create index tmdbIDIndexMovies on Movies (tmdbID);
 
 create table People(personID int auto_increment,
                     imdbNameID char(10),
-                    tmdbNameID int,
                     name varchar(255),
                     heightInCM int,
                     bio TEXT,
@@ -132,7 +92,7 @@ create table People(personID int auto_increment,
 create temporary table PeopleIMDB(imdbNameID char(10),
                                   name varchar(255),
                                   heightInCM int,
-                                  bio TEXT default null,
+                                  bio TEXT,
                                   birthDate dateTime default null,
                                   birthPlace varchar (255) default null,
                                   deathDate dateTime default null,
@@ -147,7 +107,7 @@ load data infile '/var/lib/mysql-files/03-Movies/Project35/PeopleIMDB.csv' into 
      enclosed by '"'
      lines terminated by '\r\n'
      ignore 1 lines
-     (imdbNameID, name, heightInCM, @bio, birthDate, birthPlace, deathDate, deathPlace, deathCause, totalChildren);
+     (imdbNameID, name, heightInCM, bio, birthDate, birthPlace, deathDate, deathPlace, deathCause, totalChildren);
 
 update PeopleIMDB
 set birthDate = NULL
@@ -158,7 +118,7 @@ set deathDate = NULL
 where deathDate = '2025-01-01 00:00:00';
 
 insert into People (imdbNameID, name, bio, birthDate, birthPlace, deathDate, deathPlace, deathCause, totalChildren)
-select imdbNameID, name, bio, birthDate, birthPlace, deathDate, deathPlace, deathCause, totalChildren
+select imdbNameID, TRIM(name), TRIM(bio), birthDate, TRIM(birthPlace), deathDate, TRIM(deathPlace), TRIM(deathCause), totalChildren
 from PeopleIMDB;
 
 update People set heightInCM = NULL where heightInCM = -1;
@@ -175,13 +135,13 @@ create table MovieProductionCompany(movieID int,
                                     foreign key (movieID) references Movies (movieID) on delete cascade
                                    );
 
-create temporary table MovieProductionCompanyIMDB(imdbID char(10),
+create temporary table MovieProductionCompanyIMDB(imdbID int,
                                                   companyName varChar(255),
                                                   movieID int,
                                                   primary key (imdbID)
                                                  );
 
-load data infile '/var/lib/mysql-files/03-Movies/Project35/MovieProductionCompanyIMDB.csv' into table MovieProductionCompanyIMDB
+load data infile '/var/lib/mysql-files/03-Movies/Project35/MovieProductionCompanyIMDBFixed.csv' into table MovieProductionCompanyIMDB
      fields terminated by ','
      enclosed by '"'
      lines terminated by '\r\n'
@@ -193,7 +153,7 @@ set MovieProductionCompanyIMDB.movieID = Movies.movieID
 where MovieProductionCompanyIMDB.imdbID = Movies.imdbID;
 
 insert into MovieProductionCompany (movieID, companyName)
-select movieID, companyName
+select movieID, TRIM(companyName)
 from MovieProductionCompanyIMDB
 where movieID IS NOT NULL;
 
@@ -233,26 +193,26 @@ update MovieProductionCompanyTMDB inner join Movies on MovieProductionCompanyTMD
 set MovieProductionCompanyTMDB.movieID = Movies.movieID
 where MovieProductionCompanyTMDB.tmdbID = Movies.tmdbID;
 
-insert into MovieProductionCompany (movieID, companyName) select movieID, companyName1 from MovieProductionCompanyTMDB where movieID IS NOT NULL and companyName1 <> '';
-insert into MovieProductionCompany (movieID, companyName) select movieID, companyName2 from MovieProductionCompanyTMDB where movieID IS NOT NULL and companyName2 <> '';
-insert into MovieProductionCompany (movieID, companyName) select movieID, companyName3 from MovieProductionCompanyTMDB where movieID IS NOT NULL and companyName3 <> '';
-insert into MovieProductionCompany (movieID, companyName) select movieID, companyName4 from MovieProductionCompanyTMDB where movieID IS NOT NULL and companyName4 <> '';
-insert into MovieProductionCompany (movieID, companyName) select movieID, companyName5 from MovieProductionCompanyTMDB where movieID IS NOT NULL and companyName5 <> ''; 
-insert into MovieProductionCompany (movieID, companyName) select movieID, companyName6 from MovieProductionCompanyTMDB where movieID IS NOT NULL and companyName6 <> '';
-insert into MovieProductionCompany (movieID, companyName) select movieID, companyName7 from MovieProductionCompanyTMDB where movieID IS NOT NULL and companyName7 <> '';
-insert into MovieProductionCompany (movieID, companyName) select movieID, companyName8 from MovieProductionCompanyTMDB where movieID IS NOT NULL and companyName8 <> '';
-insert into MovieProductionCompany (movieID, companyName) select movieID, companyName9 from MovieProductionCompanyTMDB where movieID IS NOT NULL and companyName9 <> '';
-insert into MovieProductionCompany (movieID, companyName) select movieID, companyName10 from MovieProductionCompanyTMDB where movieID IS NOT NULL and companyName10 <> '';
-insert into MovieProductionCompany (movieID, companyName) select movieID, companyName11 from MovieProductionCompanyTMDB where movieID IS NOT NULL and companyName11 <> '';
-insert into MovieProductionCompany (movieID, companyName) select movieID, companyName12 from MovieProductionCompanyTMDB where movieID IS NOT NULL and companyName12 <> '';
-insert into MovieProductionCompany (movieID, companyName) select movieID, companyName13 from MovieProductionCompanyTMDB where movieID IS NOT NULL and companyName13 <> '';
-insert into MovieProductionCompany (movieID, companyName) select movieID, companyName14 from MovieProductionCompanyTMDB where movieID IS NOT NULL and companyName14 <> '';
-insert into MovieProductionCompany (movieID, companyName) select movieID, companyName15 from MovieProductionCompanyTMDB where movieID IS NOT NULL and companyName15 <> '';
-insert into MovieProductionCompany (movieID, companyName) select movieID, companyName16 from MovieProductionCompanyTMDB where movieID IS NOT NULL and companyName16 <> '';
-insert into MovieProductionCompany (movieID, companyName) select movieID, companyName17 from MovieProductionCompanyTMDB where movieID IS NOT NULL and companyName17 <> '';
-insert into MovieProductionCompany (movieID, companyName) select movieID, companyName18 from MovieProductionCompanyTMDB where movieID IS NOT NULL and companyName18 <> '';
-insert into MovieProductionCompany (movieID, companyName) select movieID, companyName19 from MovieProductionCompanyTMDB where movieID IS NOT NULL and companyName19 <> '';
-insert into MovieProductionCompany (movieID, companyName) select movieID, companyName20 from MovieProductionCompanyTMDB where movieID IS NOT NULL and companyName20 <> '';
+insert ignore into MovieProductionCompany (movieID, companyName) select movieID, TRIM(companyName1) from MovieProductionCompanyTMDB where movieID IS NOT NULL and companyName1 <> '';
+insert ignore into MovieProductionCompany (movieID, companyName) select movieID, TRIM(companyName2) from MovieProductionCompanyTMDB where movieID IS NOT NULL and companyName2 <> '';
+insert ignore into MovieProductionCompany (movieID, companyName) select movieID, TRIM(companyName3) from MovieProductionCompanyTMDB where movieID IS NOT NULL and companyName3 <> '';
+insert ignore into MovieProductionCompany (movieID, companyName) select movieID, TRIM(companyName4) from MovieProductionCompanyTMDB where movieID IS NOT NULL and companyName4 <> '';
+insert ignore into MovieProductionCompany (movieID, companyName) select movieID, TRIM(companyName5) from MovieProductionCompanyTMDB where movieID IS NOT NULL and companyName5 <> ''; 
+insert ignore into MovieProductionCompany (movieID, companyName) select movieID, TRIM(companyName6) from MovieProductionCompanyTMDB where movieID IS NOT NULL and companyName6 <> '';
+insert ignore into MovieProductionCompany (movieID, companyName) select movieID, TRIM(companyName7) from MovieProductionCompanyTMDB where movieID IS NOT NULL and companyName7 <> '';
+insert ignore into MovieProductionCompany (movieID, companyName) select movieID, TRIM(companyName8) from MovieProductionCompanyTMDB where movieID IS NOT NULL and companyName8 <> '';
+insert ignore into MovieProductionCompany (movieID, companyName) select movieID, TRIM(companyName9) from MovieProductionCompanyTMDB where movieID IS NOT NULL and companyName9 <> '';
+insert ignore into MovieProductionCompany (movieID, companyName) select movieID, TRIM(companyName10) from MovieProductionCompanyTMDB where movieID IS NOT NULL and companyName10 <> '';
+insert ignore into MovieProductionCompany (movieID, companyName) select movieID, TRIM(companyName11) from MovieProductionCompanyTMDB where movieID IS NOT NULL and companyName11 <> '';
+insert ignore into MovieProductionCompany (movieID, companyName) select movieID, TRIM(companyName12) from MovieProductionCompanyTMDB where movieID IS NOT NULL and companyName12 <> '';
+insert ignore into MovieProductionCompany (movieID, companyName) select movieID, TRIM(companyName13) from MovieProductionCompanyTMDB where movieID IS NOT NULL and companyName13 <> '';
+insert ignore into MovieProductionCompany (movieID, companyName) select movieID, TRIM(companyName14) from MovieProductionCompanyTMDB where movieID IS NOT NULL and companyName14 <> '';
+insert ignore into MovieProductionCompany (movieID, companyName) select movieID, TRIM(companyName15) from MovieProductionCompanyTMDB where movieID IS NOT NULL and companyName15 <> '';
+insert ignore into MovieProductionCompany (movieID, companyName) select movieID, TRIM(companyName16) from MovieProductionCompanyTMDB where movieID IS NOT NULL and companyName16 <> '';
+insert ignore into MovieProductionCompany (movieID, companyName) select movieID, TRIM(companyName17) from MovieProductionCompanyTMDB where movieID IS NOT NULL and companyName17 <> '';
+insert ignore into MovieProductionCompany (movieID, companyName) select movieID, TRIM(companyName18) from MovieProductionCompanyTMDB where movieID IS NOT NULL and companyName18 <> '';
+insert ignore into MovieProductionCompany (movieID, companyName) select movieID, TRIM(companyName19) from MovieProductionCompanyTMDB where movieID IS NOT NULL and companyName19 <> '';
+insert ignore into MovieProductionCompany (movieID, companyName) select movieID, TRIM(companyName20) from MovieProductionCompanyTMDB where movieID IS NOT NULL and companyName20 <> '';
 
 -- MovieGenre
 
@@ -262,7 +222,7 @@ create table MovieGenre(movieID int,
                         foreign key (movieID) references Movies (movieID)  on delete cascade
                        );
 
-create temporary table MovieGenreIMDB(imdbID char(10),
+create temporary table MovieGenreIMDB(imdbID int,
                                       genre1 varchar(11),
                                       genre2 varchar(11),
                                       genre3 varchar(11),
@@ -270,7 +230,7 @@ create temporary table MovieGenreIMDB(imdbID char(10),
                                       primary key (imdbID)
                                      );
 
-load data infile '/var/lib/mysql-files/03-Movies/Project35/MovieGenreIMDB.csv' into table MovieGenreIMDB
+load data infile '/var/lib/mysql-files/03-Movies/Project35/MovieGenreIMDBFixed.csv' into table MovieGenreIMDB
      fields terminated by ','
      enclosed by '"'
      lines terminated by '\r\n'
@@ -281,9 +241,9 @@ update MovieGenreIMDB inner join Movies on MovieGenreIMDB.imdbID = Movies.imdbID
 set MovieGenreIMDB.movieID = Movies.movieID
 where MovieGenreIMDB.imdbID = Movies.imdbID;
 
-insert into MovieGenre (movieID, genre) select movieID, genre1 from MovieGenreIMDB where movieID IS NOT NULL and genre1 <> '';
-insert into MovieGenre (movieID, genre) select movieID, genre2 from MovieGenreIMDB where movieID IS NOT NULL and genre2 <> '';
-insert into MovieGenre (movieID, genre) select movieID, genre3 from MovieGenreIMDB where movieID IS NOT NULL and genre3 <> '';
+insert ignore into MovieGenre (movieID, genre) select movieID, TRIM(genre1) from MovieGenreIMDB where movieID IS NOT NULL and genre1 <> '';
+insert ignore into MovieGenre (movieID, genre) select movieID, TRIM(genre2) from MovieGenreIMDB where movieID IS NOT NULL and genre2 <> '';
+insert ignore into MovieGenre (movieID, genre) select movieID, TRIM(genre3) from MovieGenreIMDB where movieID IS NOT NULL and genre3 <> '';
 
 create temporary table MovieGenreTMDB(tmdbID char(10),
                                       genre1 varchar(15),
@@ -307,12 +267,12 @@ update MovieGenreTMDB inner join Movies on MovieGenreTMDB.tmdbID = Movies.tmdbID
 set MovieGenreTMDB.movieID = Movies.movieID
 where MovieGenreTMDB.tmdbID = Movies.tmdbID;
 
-insert into MovieGenre (movieID, genre) select movieID, genre1 from MovieGenreTMDB where movieID IS NOT NULL and genre1 <> '';
-insert into MovieGenre (movieID, genre) select movieID, genre2 from MovieGenreTMDB where movieID IS NOT NULL and genre2 <> '';
-insert into MovieGenre (movieID, genre) select movieID, genre3 from MovieGenreTMDB where movieID IS NOT NULL and genre3 <> '';
-insert into MovieGenre (movieID, genre) select movieID, genre4 from MovieGenreTMDB where movieID IS NOT NULL and genre4 <> '';
-insert into MovieGenre (movieID, genre) select movieID, genre5 from MovieGenreTMDB where movieID IS NOT NULL and genre5 <> '';
-insert into MovieGenre (movieID, genre) select movieID, genre6 from MovieGenreTMDB where movieID IS NOT NULL and genre6 <> '';
+insert ignore into MovieGenre (movieID, genre) select movieID, TRIM(genre1) from MovieGenreTMDB where movieID IS NOT NULL and genre1 <> '';
+insert ignore into MovieGenre (movieID, genre) select movieID, TRIM(genre2) from MovieGenreTMDB where movieID IS NOT NULL and genre2 <> '';
+insert ignore into MovieGenre (movieID, genre) select movieID, TRIM(genre3) from MovieGenreTMDB where movieID IS NOT NULL and genre3 <> '';
+insert ignore into MovieGenre (movieID, genre) select movieID, TRIM(genre4) from MovieGenreTMDB where movieID IS NOT NULL and genre4 <> '';
+insert ignore into MovieGenre (movieID, genre) select movieID, TRIM(genre5) from MovieGenreTMDB where movieID IS NOT NULL and genre5 <> '';
+insert ignore into MovieGenre (movieID, genre) select movieID, TRIM(genre6) from MovieGenreTMDB where movieID IS NOT NULL and genre6 <> '';
 
 -- MovieLanguage
 
@@ -322,14 +282,14 @@ create table MovieLanguage(movieID int,
                            foreign key (movieID) references Movies (movieID)  on delete cascade
                           );
 
-create temporary table MovieLanguageIMDB (imdbID char(10),
+create temporary table MovieLanguageIMDB (imdbID int,
                                           language1 varchar(25),
                                           language2 varchar(25),
                                           movieID int,
                                           primary key (imdbID)
                                          );
 
-load data infile '/var/lib/mysql-files/03-Movies/Project35/MovieLanguageIMDB.csv' into table MovieLanguageIMDB
+load data infile '/var/lib/mysql-files/03-Movies/Project35/MovieLanguageIMDBFixed.csv' into table MovieLanguageIMDB
      fields terminated by ','
      enclosed by '"'
      lines terminated by '\r\n'
@@ -340,8 +300,8 @@ update MovieLanguageIMDB inner join Movies on MovieLanguageIMDB.imdbID = Movies.
 set MovieLanguageIMDB.movieID = Movies.movieID
 where MovieLanguageIMDB.imdbID = Movies.imdbID;
 
-insert into MovieLanguage (movieID, language) select movieID, TRIM(language1) from MovieLanguageIMDB where movieID IS NOT NULL and language1 <> '';
-insert into MovieLanguage (movieID, language) select movieID, TRIM(language2) from MovieLanguageIMDB where movieID IS NOT NULL and language2 <> '';
+insert ignore into MovieLanguage (movieID, language) select movieID, TRIM(language1) from MovieLanguageIMDB where movieID IS NOT NULL and language1 <> '';
+insert ignore into MovieLanguage (movieID, language) select movieID, TRIM(language2) from MovieLanguageIMDB where movieID IS NOT NULL and language2 <> '';
 
 create temporary table MovieLanguageTMDB (tmdbID int,
                                           language1 varchar(37),
@@ -363,16 +323,16 @@ update MovieLanguageTMDB inner join Movies on MovieLanguageTMDB.tmdbID = Movies.
 set MovieLanguageTMDB.movieID = Movies.movieID
 where MovieLanguageTMDB.tmdbID = Movies.tmdbID;
 
-insert into MovieLanguage (movieID, language) select movieID, language1 from MovieLanguageTMDB where movieID IS NOT NULL and language1 <> '';
-insert into MovieLanguage (movieID, language) select movieID, language2 from MovieLanguageTMDB where movieID IS NOT NULL and language2 <> '';
-insert into MovieLanguage (movieID, language) select movieID, language3 from MovieLanguageTMDB where movieID IS NOT NULL and language3 <> '';
-insert into MovieLanguage (movieID, language) select movieID, language4 from MovieLanguageTMDB where movieID IS NOT NULL and language4 <> '';
+insert ignore into MovieLanguage (movieID, language) select movieID, TRIM(language1) from MovieLanguageTMDB where movieID IS NOT NULL and language1 <> '';
+insert ignore into MovieLanguage (movieID, language) select movieID, TRIM(language2) from MovieLanguageTMDB where movieID IS NOT NULL and language2 <> '';
+insert ignore into MovieLanguage (movieID, language) select movieID, TRIM(language3) from MovieLanguageTMDB where movieID IS NOT NULL and language3 <> '';
+insert ignore into MovieLanguage (movieID, language) select movieID, TRIM(language4) from MovieLanguageTMDB where movieID IS NOT NULL and language4 <> '';
 
 delete from MovieLanguage where language = '';
 
 -- Temp table for use in two tables below
 
-create temporary table IMDBtitlePrinciples(imdbID char(10),
+create temporary table IMDBtitlePrinciples(imdbID int,
                                        imdbNameID char(10),
                                        category varchar(19),
                                        role varchar(255),
@@ -381,7 +341,7 @@ create temporary table IMDBtitlePrinciples(imdbID char(10),
                                        primary key (imdbID, imdbNameID, category, role)
                                       );
 
-load data infile '/var/lib/mysql-files/03-Movies/Project35/IMDBtitlePrinciples.csv' into table IMDBtitlePrinciples
+load data infile '/var/lib/mysql-files/03-Movies/Project35/IMDBtitlePrinciplesFixed.csv' into table IMDBtitlePrinciples
      fields terminated by ','
      enclosed by '"'
      lines terminated by '\r\n'
@@ -402,13 +362,13 @@ where IMDBtitlePrinciples.imdbNameID = People.imdbNameID;
 
 create table MovieCrew(movieID int,
                        personID int,
-                       role varchar(255),
-                       primary key (movieID, personID, role),
+                       jobTitle varchar(255),
+                       primary key (movieID, personID, jobTitle),
                        foreign key (movieID) references Movies (movieID)  on delete cascade,
                        foreign key (personID) references People (personID)  on delete cascade
                       );
 
-insert into MovieCrew (movieID, personID, role) select movieID, personID, category from IMDBtitlePrinciples where movieID IS NOT NULL and personID IS NOT NULL and category <> '';
+insert into MovieCrew (movieID, personID, jobTitle) select movieID, personID, TRIM(category) from IMDBtitlePrinciples where movieID IS NOT NULL and personID IS NOT NULL and category <> '';
 
 -- MovieCast
 
@@ -420,7 +380,7 @@ create table MovieCast(movieID int,
                        foreign key (personID) references People (personID)  on delete cascade
                       );
 
-insert into MovieCast (movieID, personID, role) select movieID, personID, role from IMDBtitlePrinciples where movieID IS NOT NULL and personID IS NOT NULL and role <> '';
+insert into MovieCast (movieID, personID, role) select movieID, personID, TRIM(role) from IMDBtitlePrinciples where movieID IS NOT NULL and personID IS NOT NULL and role <> '';
 
 -- MovieKeyword
 
@@ -487,47 +447,47 @@ update keywords inner join Movies on keywords.tmdbID = Movies.tmdbID
 set keywords.movieID = Movies.movieID
 where keywords.tmdbID = Movies.tmdbID;
 
-insert into MovieKeyword (movieID, keyword) select movieID, keyword1 from keywords where movieID IS NOT NULL and keyword1 <> '';
-insert into MovieKeyword (movieID, keyword) select movieID, keyword2 from keywords where movieID IS NOT NULL and keyword2 <> '';
-insert into MovieKeyword (movieID, keyword) select movieID, keyword3 from keywords where movieID IS NOT NULL and keyword3 <> '';
-insert into MovieKeyword (movieID, keyword) select movieID, keyword4 from keywords where movieID IS NOT NULL and keyword4 <> '';
-insert into MovieKeyword (movieID, keyword) select movieID, keyword5 from keywords where movieID IS NOT NULL and keyword5 <> '';
-insert into MovieKeyword (movieID, keyword) select movieID, keyword6 from keywords where movieID IS NOT NULL and keyword6 <> '';
-insert into MovieKeyword (movieID, keyword) select movieID, keyword7 from keywords where movieID IS NOT NULL and keyword7 <> '';
-insert into MovieKeyword (movieID, keyword) select movieID, keyword8 from keywords where movieID IS NOT NULL and keyword8 <> '';
-insert into MovieKeyword (movieID, keyword) select movieID, keyword9 from keywords where movieID IS NOT NULL and keyword9 <> '';
-insert into MovieKeyword (movieID, keyword) select movieID, keyword10 from keywords where movieID IS NOT NULL and keyword10 <> '';
-insert into MovieKeyword (movieID, keyword) select movieID, keyword11 from keywords where movieID IS NOT NULL and keyword11 <> '';
-insert into MovieKeyword (movieID, keyword) select movieID, keyword12 from keywords where movieID IS NOT NULL and keyword12 <> '';
-insert into MovieKeyword (movieID, keyword) select movieID, keyword13 from keywords where movieID IS NOT NULL and keyword13 <> '';
-insert into MovieKeyword (movieID, keyword) select movieID, keyword14 from keywords where movieID IS NOT NULL and keyword14 <> '';
-insert into MovieKeyword (movieID, keyword) select movieID, keyword15 from keywords where movieID IS NOT NULL and keyword15 <> '';
-insert into MovieKeyword (movieID, keyword) select movieID, keyword16 from keywords where movieID IS NOT NULL and keyword16 <> '';
-insert into MovieKeyword (movieID, keyword) select movieID, keyword17 from keywords where movieID IS NOT NULL and keyword17 <> '';
-insert into MovieKeyword (movieID, keyword) select movieID, keyword18 from keywords where movieID IS NOT NULL and keyword18 <> '';
-insert into MovieKeyword (movieID, keyword) select movieID, keyword19 from keywords where movieID IS NOT NULL and keyword19 <> '';
-insert into MovieKeyword (movieID, keyword) select movieID, keyword20 from keywords where movieID IS NOT NULL and keyword20 <> '';
-insert into MovieKeyword (movieID, keyword) select movieID, keyword21 from keywords where movieID IS NOT NULL and keyword21 <> '';
-insert into MovieKeyword (movieID, keyword) select movieID, keyword22 from keywords where movieID IS NOT NULL and keyword22 <> '';
-insert into MovieKeyword (movieID, keyword) select movieID, keyword23 from keywords where movieID IS NOT NULL and keyword23 <> '';
-insert into MovieKeyword (movieID, keyword) select movieID, keyword24 from keywords where movieID IS NOT NULL and keyword24 <> '';
-insert into MovieKeyword (movieID, keyword) select movieID, keyword25 from keywords where movieID IS NOT NULL and keyword25 <> '';
-insert into MovieKeyword (movieID, keyword) select movieID, keyword26 from keywords where movieID IS NOT NULL and keyword26 <> '';
-insert into MovieKeyword (movieID, keyword) select movieID, keyword27 from keywords where movieID IS NOT NULL and keyword27 <> '';
-insert into MovieKeyword (movieID, keyword) select movieID, keyword28 from keywords where movieID IS NOT NULL and keyword28 <> '';
-insert into MovieKeyword (movieID, keyword) select movieID, keyword29 from keywords where movieID IS NOT NULL and keyword29 <> '';
-insert into MovieKeyword (movieID, keyword) select movieID, keyword30 from keywords where movieID IS NOT NULL and keyword30 <> '';
-insert into MovieKeyword (movieID, keyword) select movieID, keyword31 from keywords where movieID IS NOT NULL and keyword31 <> '';
-insert into MovieKeyword (movieID, keyword) select movieID, keyword32 from keywords where movieID IS NOT NULL and keyword32 <> '';
-insert into MovieKeyword (movieID, keyword) select movieID, keyword33 from keywords where movieID IS NOT NULL and keyword33 <> '';
-insert into MovieKeyword (movieID, keyword) select movieID, keyword34 from keywords where movieID IS NOT NULL and keyword34 <> '';
-insert into MovieKeyword (movieID, keyword) select movieID, keyword35 from keywords where movieID IS NOT NULL and keyword35 <> '';
-insert into MovieKeyword (movieID, keyword) select movieID, keyword36 from keywords where movieID IS NOT NULL and keyword36 <> '';
-insert into MovieKeyword (movieID, keyword) select movieID, keyword37 from keywords where movieID IS NOT NULL and keyword37 <> '';
-insert into MovieKeyword (movieID, keyword) select movieID, keyword38 from keywords where movieID IS NOT NULL and keyword38 <> '';
-insert into MovieKeyword (movieID, keyword) select movieID, keyword39 from keywords where movieID IS NOT NULL and keyword39 <> '';
-insert into MovieKeyword (movieID, keyword) select movieID, keyword40 from keywords where movieID IS NOT NULL and keyword40 <> '';
-insert into MovieKeyword (movieID, keyword) select movieID, keyword41 from keywords where movieID IS NOT NULL and keyword41 <> '';
+insert into MovieKeyword (movieID, keyword) select movieID, TRIM(keyword1) from keywords where movieID IS NOT NULL and keyword1 <> '';
+insert into MovieKeyword (movieID, keyword) select movieID, TRIM(keyword2) from keywords where movieID IS NOT NULL and keyword2 <> '';
+insert into MovieKeyword (movieID, keyword) select movieID, TRIM(keyword3) from keywords where movieID IS NOT NULL and keyword3 <> '';
+insert into MovieKeyword (movieID, keyword) select movieID, TRIM(keyword4) from keywords where movieID IS NOT NULL and keyword4 <> '';
+insert into MovieKeyword (movieID, keyword) select movieID, TRIM(keyword5) from keywords where movieID IS NOT NULL and keyword5 <> '';
+insert into MovieKeyword (movieID, keyword) select movieID, TRIM(keyword6) from keywords where movieID IS NOT NULL and keyword6 <> '';
+insert into MovieKeyword (movieID, keyword) select movieID, TRIM(keyword7) from keywords where movieID IS NOT NULL and keyword7 <> '';
+insert into MovieKeyword (movieID, keyword) select movieID, TRIM(keyword8) from keywords where movieID IS NOT NULL and keyword8 <> '';
+insert into MovieKeyword (movieID, keyword) select movieID, TRIM(keyword9) from keywords where movieID IS NOT NULL and keyword9 <> '';
+insert into MovieKeyword (movieID, keyword) select movieID, TRIM(keyword10) from keywords where movieID IS NOT NULL and keyword10 <> '';
+insert into MovieKeyword (movieID, keyword) select movieID, TRIM(keyword11) from keywords where movieID IS NOT NULL and keyword11 <> '';
+insert into MovieKeyword (movieID, keyword) select movieID, TRIM(keyword12) from keywords where movieID IS NOT NULL and keyword12 <> '';
+insert into MovieKeyword (movieID, keyword) select movieID, TRIM(keyword13) from keywords where movieID IS NOT NULL and keyword13 <> '';
+insert into MovieKeyword (movieID, keyword) select movieID, TRIM(keyword14) from keywords where movieID IS NOT NULL and keyword14 <> '';
+insert into MovieKeyword (movieID, keyword) select movieID, TRIM(keyword15) from keywords where movieID IS NOT NULL and keyword15 <> '';
+insert into MovieKeyword (movieID, keyword) select movieID, TRIM(keyword16) from keywords where movieID IS NOT NULL and keyword16 <> '';
+insert into MovieKeyword (movieID, keyword) select movieID, TRIM(keyword17) from keywords where movieID IS NOT NULL and keyword17 <> '';
+insert into MovieKeyword (movieID, keyword) select movieID, TRIM(keyword18) from keywords where movieID IS NOT NULL and keyword18 <> '';
+insert into MovieKeyword (movieID, keyword) select movieID, TRIM(keyword19) from keywords where movieID IS NOT NULL and keyword19 <> '';
+insert into MovieKeyword (movieID, keyword) select movieID, TRIM(keyword20) from keywords where movieID IS NOT NULL and keyword20 <> '';
+insert into MovieKeyword (movieID, keyword) select movieID, TRIM(keyword21) from keywords where movieID IS NOT NULL and keyword21 <> '';
+insert into MovieKeyword (movieID, keyword) select movieID, TRIM(keyword22) from keywords where movieID IS NOT NULL and keyword22 <> '';
+insert into MovieKeyword (movieID, keyword) select movieID, TRIM(keyword23) from keywords where movieID IS NOT NULL and keyword23 <> '';
+insert into MovieKeyword (movieID, keyword) select movieID, TRIM(keyword24) from keywords where movieID IS NOT NULL and keyword24 <> '';
+insert into MovieKeyword (movieID, keyword) select movieID, TRIM(keyword25) from keywords where movieID IS NOT NULL and keyword25 <> '';
+insert into MovieKeyword (movieID, keyword) select movieID, TRIM(keyword26) from keywords where movieID IS NOT NULL and keyword26 <> '';
+insert into MovieKeyword (movieID, keyword) select movieID, TRIM(keyword27) from keywords where movieID IS NOT NULL and keyword27 <> '';
+insert into MovieKeyword (movieID, keyword) select movieID, TRIM(keyword28) from keywords where movieID IS NOT NULL and keyword28 <> '';
+insert into MovieKeyword (movieID, keyword) select movieID, TRIM(keyword29) from keywords where movieID IS NOT NULL and keyword29 <> '';
+insert into MovieKeyword (movieID, keyword) select movieID, TRIM(keyword30) from keywords where movieID IS NOT NULL and keyword30 <> '';
+insert into MovieKeyword (movieID, keyword) select movieID, TRIM(keyword31) from keywords where movieID IS NOT NULL and keyword31 <> '';
+insert into MovieKeyword (movieID, keyword) select movieID, TRIM(keyword32) from keywords where movieID IS NOT NULL and keyword32 <> '';
+insert into MovieKeyword (movieID, keyword) select movieID, TRIM(keyword33) from keywords where movieID IS NOT NULL and keyword33 <> '';
+insert into MovieKeyword (movieID, keyword) select movieID, TRIM(keyword34) from keywords where movieID IS NOT NULL and keyword34 <> '';
+insert into MovieKeyword (movieID, keyword) select movieID, TRIM(keyword35) from keywords where movieID IS NOT NULL and keyword35 <> '';
+insert into MovieKeyword (movieID, keyword) select movieID, TRIM(keyword36) from keywords where movieID IS NOT NULL and keyword36 <> '';
+insert into MovieKeyword (movieID, keyword) select movieID, TRIM(keyword37) from keywords where movieID IS NOT NULL and keyword37 <> '';
+insert into MovieKeyword (movieID, keyword) select movieID, TRIM(keyword38) from keywords where movieID IS NOT NULL and keyword38 <> '';
+insert into MovieKeyword (movieID, keyword) select movieID, TRIM(keyword39) from keywords where movieID IS NOT NULL and keyword39 <> '';
+insert into MovieKeyword (movieID, keyword) select movieID, TRIM(keyword40) from keywords where movieID IS NOT NULL and keyword40 <> '';
+insert into MovieKeyword (movieID, keyword) select movieID, TRIM(keyword41) from keywords where movieID IS NOT NULL and keyword41 <> '';
 
 -- RatingsIMDB
 
@@ -539,7 +499,7 @@ create table RatingsIMDB(movieID int,
                         foreign key (movieID) references Movies (movieID)  on delete cascade
                        );
 
-create temporary table tempRatingsIMDB(imdbID char(10),
+create temporary table tempRatingsIMDB(imdbID int,
                                        totalVotes int,
                                        meanVote float,
                                        medianVote int,
@@ -547,7 +507,7 @@ create temporary table tempRatingsIMDB(imdbID char(10),
                                        primary key(imdbID)
                                       );
                               
-load data infile '/var/lib/mysql-files/03-Movies/Project35/RatingsIMDB.csv' into table tempRatingsIMDB
+load data infile '/var/lib/mysql-files/03-Movies/Project35/RatingsIMDBFixed.csv' into table tempRatingsIMDB
      fields terminated by ','
      enclosed by '"'
      lines terminated by '\r\n'
@@ -609,7 +569,7 @@ create table UserRatingDemographics(movieID int,
                                     foreign key (movieID) references Movies (movieID) on delete cascade
                                    );
 
-create temporary table UserDemoTemp(imdbID char(10),
+create temporary table UserDemoTemp(imdbID int,
                                     age0Male float,
                                     age18Male float,
                                     age30Male float,
@@ -622,7 +582,7 @@ create temporary table UserDemoTemp(imdbID char(10),
                                     primary key (imdbID)
                                    );
 
-load data infile '/var/lib/mysql-files/03-Movies/Project35/UserRatingDemographics.csv' into table UserDemoTemp
+load data infile '/var/lib/mysql-files/03-Movies/Project35/UserRatingDemographicsFixed.csv' into table UserDemoTemp
      fields terminated by ','
      enclosed by '"'
      lines terminated by '\r\n'
