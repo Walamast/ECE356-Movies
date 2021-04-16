@@ -1,5 +1,5 @@
-import { FormEventHandler, useState } from 'react';
-import { Link, NavLink, Router, useHistory } from 'react-router-dom';
+import { useState } from 'react';
+import { Link, NavLink, useHistory } from 'react-router-dom';
 import './Navbar.scss';
 
 function Navbar() {
@@ -11,6 +11,7 @@ function Navbar() {
     e.preventDefault();
     if (query) {
       history.push("/search?value=" + query + "&type=" + queryType);
+      window.location.reload();
     }
   }
 
@@ -23,7 +24,7 @@ function Navbar() {
             <select id="search-type" className="form-control" defaultValue="movies" onChange={(e) => setQueryType(e.target.value)}>
               <option value="movies">Movies</option>
               <option value="people">People</option>
-              <option value="genre">Genre</option>
+              <option value="keyword">Keyword</option>
             </select>
             <button type="submit" id="search-button" className="btn btn-primary"><img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Magnifying_glass_icon.svg" alt="Search" /></button>
           </form>

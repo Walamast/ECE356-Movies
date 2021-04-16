@@ -4,6 +4,7 @@ import * as mysql from 'mysql2';
 
 const app = express();
 app.use(cors());
+app.use(express.json());
 app.listen(3001, () => {
     console.log("Express started on port 3001.");
 });
@@ -25,14 +26,16 @@ const runQuery = (query: string, res: any) => {
             return;
         }
         connection.query(query,
-        (err: mysql.QueryError, result: any) => {
-            if (err) {
-                console.error(err);
-            } else {
-                res.send(result);
+            (err: mysql.QueryError, result: any) => {
+                if (err) {
+                    console.error(err);
+                } else {
+                    console.log(query);
+                    res.send(result);
+                }
+                connection.release();
             }
-            connection.release();
-        });
+        );
     });
 }
 
@@ -48,4 +51,19 @@ app.get('/api/birthday', (req, res) => {
     runQuery("select personID, name from People where day(birthDate) = day(curdate()) and month(birthDate) = month(curdate()) limit 10", res);
 });
 
-// select movieID, title from Movies where releaseDate < curdate() order by releaseDate desc limit 10;
+app.post('/api/search', (req, res) => {
+    const query = req.body.query;
+    const type = req.body.type;
+
+    switch(type) {
+        case "movies":
+            runQuery("select movieID, originalTitle, year(releaseDate) as year from Movies where lower(originalTitle) like lower('%" + query + "%')", res);
+            break;
+        case "people":
+            runQuery("select personID, name from People where lower(name) like lower('%" + query + "%')", res);
+            break;
+        case "keyword":
+            runQuery("select distinct Movies.movieID, originalTitle, year(releaseDate) as year from Movies inner join MovieKeyword on Movies.movieID=MovieKeyword.movieID where lower(originalTitle) like lower('%" + query + "%')", res);
+            break;
+    }
+});
