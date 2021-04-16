@@ -12,5 +12,5 @@ Data mining queries used for the data mining investigation section of this proje
 Unit tests to test validity of the database created by `CreateProject.sql`
 
 ### `CSVs`
-All CSVs are located at: https://uofwaterloo-my.sharepoint.com/:f:/g/personal/walamast_uwaterloo_ca/EslILO0c8-lOofQZPOgTPlcBxKVbcvIqbvTAZ8sRqlSREw?e=PypfCE
-Note: Requires uwaterloo account to view, read-only permission
+All CSVs are located [here](https://uofwaterloo-my.sharepoint.com/:f:/g/personal/walamast_uwaterloo_ca/EslILO0c8-lOofQZPOgTPlcBxKVbcvIqbvTAZ8sRqlSREw?e=PypfCE)  
+*Note*: Requires uwaterloo account to view, read-only permission
