@@ -49,16 +49,37 @@
 .navbar-links {
   list-style: none;
   padding-left: 5vw;
-  display: inline-block;
+  display: flex;
   margin: 0;
 
   a {
     font-weight: 900;
     font-size: 1.2em;
     color: white;
+    padding: 0;
+    margin-right: 2em;
 
     &:hover, &.active {
       color: rgb(243, 206, 19);
+    }
+  }
+
+  .dropdown {
+    .btn-secondary {
+      background-color: rgb(243, 206, 19);
+      border-color: rgb(243, 206, 19);
+      color: black;
+    }
+
+    button {
+      color: black;
+      padding: 0 0.5em;
+      font-weight: 900;
+      font-size: 1.2em;
+
+       &:hover {
+         color: #111;
+       }
     }
   }
 }

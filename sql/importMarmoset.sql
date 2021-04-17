@@ -14,6 +14,8 @@ drop table if exists UserRatingsTMDB;
 drop table if exists UserRatingDemographics;
 drop table if exists Movies;
 drop table if exists People;
+drop table if exists Users;
+drop table if exists UserRatings;
 
 -- Create Movies table and fill it
 
@@ -619,6 +621,26 @@ alter table UserRatingDemographics modify movieID int not null, modify gender ch
 alter table UserRatingDemographics add primary key (movieID, gender, ageStart);
 
 update UserRatingDemographics set meanVote = null where meanVote = -1;
+
+-- Users
+
+create table Users(userID int auto_increment,
+                   username varchar(255),
+                   password varchar(255),
+                   primary key (userID),
+                   unique (username)
+                  );
+
+-- UserRatings
+
+create table UserRatings(userID int,
+                         movieID int,
+                         rating int,
+                         primary key (userID, movieID),
+                         foreign key (userID) references Users(userID) on delete cascade,
+                         foreign key (movieID) references Movies(movieID) on delete cascade,
+                         check (rating > 0 and rating <= 10)
+                        );
 
 -- finish
 nowarning;

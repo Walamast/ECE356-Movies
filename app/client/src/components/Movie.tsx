@@ -74,7 +74,7 @@ const Movie = (data: any) => {
             {
               crew.map((val: any, key: any) => {
                   const url = "/people/" + val.personID;
-                  return (<tr key={key}><td><a href={url}>{ val.name }</a></td><td>{ val.role }</td></tr>);
+                  return (<tr key={key}><td><a href={url}>{ val.name }</a></td><td>{ val.jobTitle }</td></tr>);
               })
             }
             </tbody>

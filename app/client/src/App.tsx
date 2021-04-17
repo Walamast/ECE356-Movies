@@ -3,6 +3,7 @@ import './App.scss';
 import Home from './components/Home';
 import About from './components/About';
 import Navbar from './components/Navbar';
+import Login from './components/Login';
 import Search from './components/Search';
 import Movie from './components/Movie';
 import Person from './components/Person';
@@ -15,6 +16,7 @@ function App() {
       <Switch>
         <Route path='/' exact component={ Home } />
         <Route path='/about' component={ About } />
+        <Route path='/signin' component={ Login } />
         <Route path='/search' component={ Search } />
         <Route path='/movie/:id' component={ Movie } />
         <Route path='/people/:id' component={ Person } />

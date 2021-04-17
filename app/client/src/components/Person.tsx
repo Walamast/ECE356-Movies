@@ -45,7 +45,7 @@ const Person = (data: any) => {
             {
               jobs.map((val: any, key: any) => {
                   const url = "/movie/" + val.movieID;
-                  return (<tr key={key}><td><a href={url}>{ val.originalTitle }</a></td><td>{ val.role }</td></tr>);
+                  return (<tr key={key}><td><a href={url}>{ val.originalTitle }</a></td><td>{ val.jobTitle }</td></tr>);
               })
             }
             </tbody>
