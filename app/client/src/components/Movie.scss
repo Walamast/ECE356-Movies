@@ -1,0 +1,65 @@
+.movie {
+    padding: 10em 20em;
+    color: white;
+
+    h1 {
+        font-weight: 900;
+    }
+
+    h2 {
+        font-size: 1.5em;
+        padding-bottom: 1em;
+        color: gray;
+    }
+
+    .rating {
+        display: flex;
+        padding-bottom: 2em;
+
+        .imdb, .tmdb {
+            display: flex;
+            align-items: center;
+            margin-right: 3em;
+        }
+
+        img {
+            width: 40px;
+            margin-right: 0.5em;
+        }
+
+        p {
+            margin: 0;
+        }
+    }
+
+    .description {
+        font-size: 1.2em;
+        padding: 1em 0;
+    }
+
+    .col-sm {
+        padding: 1em 1em;
+
+        h2 {
+            font-weight: 900;
+            font-size: 1.5em;
+            padding: 1em 0;
+            color: white;
+        }
+
+        b {
+            color: gold;
+        }
+    
+        td {
+            padding: 0.5em 2em 0.5em 0;
+            border-bottom: 1px solid #111;
+        }
+    }
+}
+
+@media(max-width: 1280px) {
+    .movie {
+        padding: 10em 2em;
+    }
+}

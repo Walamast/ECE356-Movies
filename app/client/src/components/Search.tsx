@@ -36,7 +36,7 @@ function Search() {
         {
           results.length ? 
             results.map((val: any, key: any) => {
-                const url = (queryType === "people" ? "/people/" + val.personID : "/movies/" + val.movieID);
+                const url = (queryType === "people" ? "/people/" + val.personID : "/movie/" + val.movieID);
                 return (<li key={key}><a href={url}>{ queryType === "people" ? val.name : val.originalTitle + (val.year ? " (" + val.year + ")" : "") }</a></li>);
             }) 
           : 

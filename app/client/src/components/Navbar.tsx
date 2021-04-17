@@ -10,7 +10,7 @@ function Navbar() {
   const submitAction = (e: any) => {
     e.preventDefault();
     if (query) {
-      history.push("/search?value=" + query + "&type=" + queryType);
+      history.push("/search?value=" + encodeURIComponent(query) + "&type=" + encodeURIComponent(queryType));
       window.location.reload();
     }
   }

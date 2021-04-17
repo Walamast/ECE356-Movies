@@ -6,48 +6,26 @@ const Person = (data: any) => {
   const [jobs, setJobs] = useState([]);
   const [roles, setRoles] = useState([]);
 
+  const postData = (url: string, updateFunction: any) => {
+    fetch(url, { 
+      method: 'POST', 
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ id: data.match.params.id })
+    }).then(function(response) {
+      return response.json();
+    }).then(function(json: any) {
+      updateFunction(json);
+    }).catch(function(err: any) {
+      console.error(err);
+    });
+  }
+
   useEffect(() => {
-    fetch("http://localhost:3001/api/person", { 
-      method: 'POST', 
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ id: data.match.params.id })
-    }).then(function(response) {
-      return response.json();
-    }).then(function(json: any) {
-      setResults(json);
-    }).catch(function(err: any) {
-      console.error(err);
-    });
-    
-    fetch("http://localhost:3001/api/person/jobs", { 
-      method: 'POST', 
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ id: data.match.params.id })
-    }).then(function(response) {
-      return response.json();
-    }).then(function(json: any) {
-      setJobs(json);
-    }).catch(function(err: any) {
-      console.error(err);
-    });
-    
-    fetch("http://localhost:3001/api/person/roles", { 
-      method: 'POST', 
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ id: data.match.params.id })
-    }).then(function(response) {
-      return response.json();
-    }).then(function(json: any) {
-      setRoles(json);
-    }).catch(function(err: any) {
-      console.error(err);
-    });
+    postData("http://localhost:3001/api/person", setResults);
+    postData("http://localhost:3001/api/person/jobs", setJobs);
+    postData("http://localhost:3001/api/person/roles", setRoles);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
@@ -66,7 +44,7 @@ const Person = (data: any) => {
             <tbody>
             {
               jobs.map((val: any, key: any) => {
-                  const url = "/movies/" + val.movieID;
+                  const url = "/movie/" + val.movieID;
                   return (<tr key={key}><td><a href={url}>{ val.originalTitle }</a></td><td>{ val.role }</td></tr>);
               })
             }
@@ -77,7 +55,7 @@ const Person = (data: any) => {
             <tbody>
             {
               roles.map((val: any, key: any) => {
-                  const url = "/movies/" + val.movieID;
+                  const url = "/movie/" + val.movieID;
                   return (<tr key={key}><td><a href={url}>{ val.originalTitle }</a></td><td>{ val.role }</td></tr>);
               })
             }

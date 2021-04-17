@@ -82,3 +82,43 @@ app.post('/api/person/roles', (req, res) => {
     const personID = req.body.id
     runQuery("select MovieCast.movieID, originalTitle, role from MovieCast inner join Movies on MovieCast.movieID=Movies.movieID where personID=" + personID, res);
 });
+
+app.post('/api/movie', (req, res) => {
+    const movieID = req.body.id
+    runQuery("select originalTitle, year(releaseDate) as year, date_format(releaseDate, '%b %d, %Y') as releaseDate, runTimeMinutes, description, budget, budgetCurrency, grossUSA, grossInternational, mpaa from Movies where movieID=" + movieID, res);
+});
+
+app.post('/api/movie/genre', (req, res) => {
+    const movieID = req.body.id
+    runQuery("select distinct genre from MovieGenre where movieID=" + movieID, res);
+});
+
+app.post('/api/movie/language', (req, res) => {
+    const movieID = req.body.id
+    runQuery("select distinct language from MovieLanguage where movieID=" + movieID, res);
+});
+
+app.post('/api/movie/production', (req, res) => {
+    const movieID = req.body.id
+    runQuery("select distinct companyName from MovieProductionCompany where movieID=" + movieID, res);
+});
+
+app.post('/api/movie/crew', (req, res) => {
+    const movieID = req.body.id
+    runQuery("select name, People.personID, role from MovieCrew inner join People on MovieCrew.personID=People.personID where movieID=" + movieID, res);
+});
+
+app.post('/api/movie/cast', (req, res) => {
+    const movieID = req.body.id
+    runQuery("select name, People.personID, role from MovieCast inner join People on MovieCast.personID=People.personID where movieID=" + movieID, res);
+});
+
+app.post('/api/movie/imdb', (req, res) => {
+    const movieID = req.body.id
+    runQuery("select meanVote from RatingsIMDB where movieID=" + movieID, res);
+});
+
+app.post('/api/movie/tmdb', (req, res) => {
+    const movieID = req.body.id
+    runQuery("select round(meanVote, 1) as meanVote from UserRatingsTMDB where movieID=" + movieID, res);
+});
