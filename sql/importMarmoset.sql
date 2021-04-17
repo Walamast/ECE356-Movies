@@ -117,15 +117,14 @@ update PeopleIMDB
 set deathDate = NULL
 where deathDate = '2025-01-01 00:00:00';
 
-insert into People (imdbNameID, name, bio, birthDate, birthPlace, deathDate, deathPlace, deathCause, totalChildren)
-select imdbNameID, TRIM(name), TRIM(bio), birthDate, TRIM(birthPlace), deathDate, TRIM(deathPlace), TRIM(deathCause), totalChildren
+insert into People (imdbNameID, name, heightInCM, bio, birthDate, birthPlace, deathDate, deathPlace, deathCause, totalChildren)
+select imdbNameID, TRIM(name), heightInCM, TRIM(bio), birthDate, TRIM(birthPlace), deathDate, TRIM(deathPlace), TRIM(deathCause), totalChildren
 from PeopleIMDB;
 
 update People set heightInCM = NULL where heightInCM = -1;
 update People set totalChildren = NULL where totalChildren = -1;
 
 create index imdbIDIndexPeople on People (imdbNameID);
-create index tmdbIDIndexPeople on People (tmdbNameID);
 
 -- MovieProductionCompany
 
