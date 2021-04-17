@@ -31,8 +31,8 @@ function About() {
             <h2>Bruce Nguyen</h2>
             <a href="mailto:b34nguye@uwaterloo.ca">b34nguye@uwaterloo.ca</a>
             <p>
-              Assisted with the relational schema design, and did full-stack development
-              for the client application, including unit testing.
+              Assisted with the relational schema design, and developed both the front
+              and back-end for the client application.
             </p>
           </div>
           <div className="col-sm">

@@ -1,0 +1,38 @@
+.person {
+    padding: 10em 20em;
+    color: white;
+
+    h1 {
+        font-weight: 900;
+    }
+
+    .description {
+        font-size: 1.2em;
+        padding: 1em 0;
+    }
+
+    .col-sm {
+        padding: 1em 1em;
+
+        h2 {
+            font-weight: 900;
+            font-size: 1.5em;
+            padding: 1em 0;
+        }
+
+        b {
+            color: gold;
+        }
+    
+        td {
+            padding: 0.5em 2em 0.5em 0;
+            border-bottom: 1px solid #111;
+        }
+    }
+}
+
+@media(max-width: 1280px) {
+    .person {
+        padding: 10em 2em;
+    }
+}

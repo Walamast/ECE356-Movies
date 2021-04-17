@@ -67,3 +67,18 @@ app.post('/api/search', (req, res) => {
             break;
     }
 });
+
+app.post('/api/person', (req, res) => {
+    const personID = req.body.id
+    runQuery("select name, bio, date_format(birthDate, '%b %d, %Y') as birthDate, birthPlace, date_format(deathDate, '%b %d, %Y') as deathDate, deathPlace, deathCause, heightInCM, totalChildren from People where personID=" + personID, res);
+});
+
+app.post('/api/person/jobs', (req, res) => {
+    const personID = req.body.id
+    runQuery("select MovieCrew.movieID, originalTitle, role from MovieCrew inner join Movies on MovieCrew.movieID=Movies.movieID where personID=" + personID, res);
+});
+
+app.post('/api/person/roles', (req, res) => {
+    const personID = req.body.id
+    runQuery("select MovieCast.movieID, originalTitle, role from MovieCast inner join Movies on MovieCast.movieID=Movies.movieID where personID=" + personID, res);
+});
