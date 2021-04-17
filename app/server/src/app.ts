@@ -243,6 +243,9 @@ app.post('/api/movie/cast', (req, res) => {
     runQuery("select name, People.personID, role from MovieCast inner join People on MovieCast.personID=People.personID where movieID=?", movieID, res);
 });
 
+/**
+ * Review APIs
+ */
 app.post('/api/movie/imdb', (req, res) => {
     const movieID = req.body.id;
     runQuery("select meanVote from RatingsIMDB where movieID=?", movieID, res);
@@ -253,7 +256,45 @@ app.post('/api/movie/tmdb', (req, res) => {
     runQuery("select round(meanVote, 1) as meanVote from UserRatingsTMDB where movieID=?", movieID, res);
 });
 
-/**
- * Review APIs
- */
-//TODO
+app.post('/api/movie/rating', (req, res) => {
+    const movieID = req.body.id;
+    runQuery("select round(avg(rating), 1) as meanVote from UserRatings where movieID=?", movieID, res);
+});
+
+app.post('/api/movie/rating/get', (req, res) => {
+    const movieID = req.body.id;
+    if (req.session.user) {
+        runQuery("select rating from UserRatings where userID=? and movieID=?", [req.session.user[0].userID, movieID], res);
+    } else {
+        res.send({});
+    }
+});
+
+app.post('/api/movie/rating/add', (req, res) => {
+    const movieID = req.body.id;
+    const rating = req.body.rating;
+    if (req.session.user) {
+        runQuery("insert into UserRatings (userID, movieID, rating) values (?, ?, ?)", [req.session.user[0].userID, movieID, rating], res);
+    } else {
+        res.send({});
+    }
+});
+
+app.post('/api/movie/rating/edit', (req, res) => {
+    const movieID = req.body.id;
+    const rating = req.body.rating;
+    if (req.session.user) {
+        runQuery("update UserRatings set rating=? where userID=? and movieID=?", [rating, req.session.user[0].userID, movieID], res);
+    } else {
+        res.send({});
+    }
+});
+
+app.post('/api/movie/rating/delete', (req, res) => {
+    const movieID = req.body.id;
+    if (req.session.user) {
+        runQuery("delete from UserRatings where userID=? and movieID=?", [req.session.user[0].userID, movieID], res);
+    } else {
+        res.send({});
+    }
+});

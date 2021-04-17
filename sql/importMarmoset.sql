@@ -3,6 +3,8 @@ tee project-outfile.txt;
 
 warnings;
 
+drop table if exists UserRatings;
+drop table if exists Users;
 drop table if exists MovieProductionCompany;
 drop table if exists MovieGenre;
 drop table if exists MovieLanguage;
@@ -14,8 +16,6 @@ drop table if exists UserRatingsTMDB;
 drop table if exists UserRatingDemographics;
 drop table if exists Movies;
 drop table if exists People;
-drop table if exists Users;
-drop table if exists UserRatings;
 
 -- Create Movies table and fill it
 

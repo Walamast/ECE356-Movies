@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import './Movie.scss';
+import logo from '../assets/logo512.png'
 
 const Movie = (data: any) => {
   const [results, setResults] = useState([]);
@@ -10,10 +11,14 @@ const Movie = (data: any) => {
   const [cast, setCast] = useState([]);
   const [imdbRating, setImdbRating] = useState([]);
   const [tmdbRating, setTmdbRating] = useState([]);
+  const [rating, setRating] = useState([]);
+  const [userRating, setUserRating] = useState([]);
+  const [loginStatus, setLoginStatus] = useState(false);
 
   const postData = (url: string, updateFunction: any) => {
     fetch(url, { 
       method: 'POST', 
+      credentials: 'include',
       headers: {
         'Content-Type': 'application/json'
       },
@@ -21,10 +26,59 @@ const Movie = (data: any) => {
     }).then(function(response) {
       return response.json();
     }).then(function(json: any) {
-      updateFunction(json);
+      if (updateFunction) updateFunction(json);
     }).catch(function(err: any) {
       console.error(err);
     });
+  }
+
+  const getLoginStatus = () => {
+    fetch("http://localhost:3001/api/signin", { method: 'GET', credentials: 'include' })
+    .then(function(response) {
+      return response.json();
+    }).then(function(json: any) {
+      setLoginStatus(json.loginStatus);
+    }).catch(function(err: any) {
+      console.error(err);
+    });
+  }
+
+  const reviewQuery = (url: string, rating: number) => {
+    fetch(url, { 
+      method: 'POST', 
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ id: data.match.params.id, rating: rating })
+    }).then(function(response) {
+      return response.json();
+    }).catch(function(err: any) {
+      console.error(err);
+    });
+  }
+
+  const setReview = (e: any) => {
+    e.preventDefault();
+    var review = prompt("Enter your rating (1-10)", (userRating.length ? (userRating[0] as any).rating : 10));
+
+    if (review && parseInt(review) > 0 && parseInt(review) <= 10) {
+      if (userRating.length) {
+        reviewQuery("http://localhost:3001/api/movie/rating/edit", parseInt(review));
+      } else {
+        reviewQuery("http://localhost:3001/api/movie/rating/add", parseInt(review));
+      }
+    } else {
+      window.alert("Invalid rating.");
+    }
+    window.location.reload();
+  }
+
+  const deleteReview = () => {
+    if (window.confirm("Are you sure?")) {
+      postData("http://localhost:3001/api/movie/rating/delete", undefined);
+      window.location.reload();
+    }
   }
 
   useEffect(() => {
@@ -36,6 +90,9 @@ const Movie = (data: any) => {
     postData("http://localhost:3001/api/movie/cast", setCast);
     postData("http://localhost:3001/api/movie/imdb", setImdbRating);
     postData("http://localhost:3001/api/movie/tmdb", setTmdbRating);
+    postData("http://localhost:3001/api/movie/rating", setRating);
+    postData("http://localhost:3001/api/movie/rating/get", setUserRating);
+    getLoginStatus();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
@@ -46,7 +103,7 @@ const Movie = (data: any) => {
       <h2>{ (results[0] as any).year ? (results[0] as any).year : "" }</h2>
       <div className="rating">
         {
-          imdbRating[0] ?
+          imdbRating.length ?
             <div className="imdb">
               <img src="https://ia.media-imdb.com/images/M/MV5BMTczNjM0NDY0Ml5BMl5BcG5nXkFtZTgwMTk1MzQ2OTE@._V1_.png" alt="IMDB" />
               <p>{ (imdbRating[0] as any).meanVote }/10</p>
@@ -54,12 +111,31 @@ const Movie = (data: any) => {
           : ""
         }
         {
-          tmdbRating[0] ?
+          tmdbRating.length ?
             <div className="tmdb">
               <img src="https://upload.wikimedia.org/wikipedia/commons/8/89/Tmdb.new.logo.svg" alt="TMDB" />
               <p>{ (tmdbRating[0] as any).meanVote }/5</p>
             </div>
           : ""
+        }
+        {
+          rating && rating[0] && (rating[0] as any).meanVote ?
+            <div className="local">
+              <img src={logo} alt="rating" />
+              <p>{ (rating[0] as any).meanVote }/10</p>
+            </div>
+          : ""
+        }
+        {
+          loginStatus ? (
+            !userRating.length ?
+              <button className="btn btn-primary" onClick={ setReview }>Add Review</button>
+            : 
+              <div>
+                <button className="btn btn-primary" onClick={ setReview }>Edit Review</button>
+                <button className="btn btn-primary" onClick={ deleteReview }>Delete Review</button>
+              </div>
+          ): ""
         }
       </div>
       {

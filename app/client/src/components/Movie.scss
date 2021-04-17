@@ -16,7 +16,7 @@
         display: flex;
         padding-bottom: 2em;
 
-        .imdb, .tmdb {
+        div {
             display: flex;
             align-items: center;
             margin-right: 3em;
@@ -29,6 +29,17 @@
 
         p {
             margin: 0;
+        }
+
+        button {
+            margin-right: 1em;
+        }
+
+        .btn-primary {
+            background-color: gold;
+            border-color: gold;
+            color: black;
+            font-weight: 900;
         }
     }
 
