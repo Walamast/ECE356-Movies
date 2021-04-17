@@ -49,7 +49,7 @@ const Movie = (data: any) => {
           imdbRating[0] ?
             <div className="imdb">
               <img src="https://ia.media-imdb.com/images/M/MV5BMTczNjM0NDY0Ml5BMl5BcG5nXkFtZTgwMTk1MzQ2OTE@._V1_.png" alt="IMDB" />
-              <p>{ (imdbRating[0] as any).meanVote }</p>
+              <p>{ (imdbRating[0] as any).meanVote }/10</p>
             </div>
           : ""
         }
@@ -57,7 +57,7 @@ const Movie = (data: any) => {
           tmdbRating[0] ?
             <div className="tmdb">
               <img src="https://upload.wikimedia.org/wikipedia/commons/8/89/Tmdb.new.logo.svg" alt="TMDB" />
-              <p>{ (tmdbRating[0] as any).meanVote }</p>
+              <p>{ (tmdbRating[0] as any).meanVote }/5</p>
             </div>
           : ""
         }
