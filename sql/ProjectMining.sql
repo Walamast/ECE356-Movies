@@ -13,16 +13,23 @@
 
 -- Part 1
 -- The top 10 most USA gross profitable movies are  
-select title,grossUSA from Movies where grossUSA is not null order by grossUSA desc limit 10; 
+select originalTitle as 'Original Title',grossUSA from Movies where grossUSA is not null order by grossUSA desc limit 50; 
 
 -- Part 2
--- Get movie genres for all the top 10 most profitable movies
-with  	movieIDsForTop10 as 
-			(select movieID from Movies where grossUSA is not null order by grossUSA desc limit 10),
+-- Get movie genres for all the top 50 most profitable movies
+with  	movieIDsForTop50 as 
+			(select movieID from Movies where grossUSA is not null order by grossUSA desc limit 50),
 		listofGenres as 
-			(select ltrim(genre) as genreXD from MovieGenre inner join movieIDsForTop10 using (movieID))
+			(select ltrim(genre) as genreXD from MovieGenre inner join movieIDsForTop50 using (movieID))
 select genreXD as 'Movie genres',count(*) as Count from listofGenres group by genreXD order by Count desc; 
 
+-- Part 3
+-- Get movie release years for all the top 50 most profitable movies
+with  	movieIDsForTop50 as 
+			(select movieID from Movies where grossUSA is not null order by grossUSA desc limit 50),
+		listofYears as 
+			(select year(releaseDate) as releaseDateXD from Movies inner join movieIDsForTop50 using (movieID))
+select releaseDateXD as 'Movie Release Years',count(*) as Counter from listofYears group by releaseDateXD order by Counter desc, releaseDateXD desc; 
 
 -- Data mining final query
 -- Select top 25 movies and their USA gross income that are not part of the top 50 highest movies by USA gross income 
